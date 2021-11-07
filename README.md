@@ -76,3 +76,30 @@ chown -R etcd:etcd /var/lib/etcd
 systemctl start etcd
 systemctl status etcd
 ```
+
+## network policy
+
+### label the namespace
+```shell
+kubectl label namespace big-corp name=big-corp
+```
+### create networkpolicy
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-port-from-namespace
+  namespace: my-app
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: big-corp
+    ports:
+    - protocol: TCP
+      port: 8080
+```
