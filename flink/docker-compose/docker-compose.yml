@@ -1,0 +1,33 @@
+version: "2.2"
+services:
+  jobmanager:
+    image: flink:latest
+    ports:
+      - "8082:8081"
+    command: jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+
+  taskmanager:
+    image: flink:latest
+    depends_on:
+      - jobmanager
+    command: taskmanager
+    scale: 1
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.memory.task.heap.size: 2g
+        taskmanager.memory.process.size: 20g
+        taskmanager.memory.network.min: 4g
+        taskmanager.memory.network.max: 10g
+        taskmanager.numberOfTaskSlots: 500
+        metrics.reporter.influxdb.class: org.apache.flink.metrics.influxdb.InfluxdbReporter
+        metrics.reporter.influxdb.host: 10.85.241.9
+        metrics.reporter.influxdb.port: 8086
+        metrics.reporter.influxdb.db: metrics-database
+        metrics.reporter.influxdb.username: admin
+        metrics.reporter.influxdb.password: admin
